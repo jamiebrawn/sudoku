@@ -63,10 +63,14 @@ function draw() {
           var x = sx * size + gx;
           var y = sy * size + gy;
 
-          // Select a random symbol to use
-          var symbols_possible = getPossibleSymbols(sx, sy, gx, gy);
-          var symbol = getRandomItemInArray(symbols_possible);
-          symbols_grid[sx][sy][gx][gy] = symbol;
+          var symbol = symbols_grid[sx][sy][gx][gy];
+          if (!symbol) {
+              // Select a random symbol to use, if not already set from checkLoneValidSymbols
+              var symbols_possible = getPossibleSymbols(sx, sy, gx, gy);
+              symbol = getRandomItemInArray(symbols_possible);
+              symbols_grid[sx][sy][gx][gy] = symbol;
+              checkLoneValidSymbols();
+          }
 
           // White squares
           ctx.fillStyle = "white";
@@ -78,6 +82,31 @@ function draw() {
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(symbol, (x + 0.5) * size_each + (size_border * 0.5), (y + 0.5) * size_each + size_border);
+        }
+      }
+    }
+  }
+}
+
+function checkLoneValidSymbols() {
+  // This is used to go though all spots and check if there only one available symbol to use
+  for (var sx = 0; sx < size; sx++) {
+    for (var sy = 0; sy < size; sy++) {
+      for (var gx = 0; gx < size; gx++) {
+        for (var gy = 0; gy < size; gy++) {
+            if (symbols_grid[sx][sy][gx][gy])
+                continue;   // already set
+
+            var symbols_possible = getPossibleSymbols(sx, sy, gx, gy);
+            if (symbols_possible.length == 1) {
+                symbols_grid[sx][sy][gx][gy] = symbols_possible[0];
+
+                // Since we just added one, start again on searching for another lone symbol
+                checkLoneValidSymbols();
+                return;
+            } else if (symbols_possible.length == 0) {
+                throw new Error("No available symbol to select at [" + sx + "][" + sy + "][" + gx + "][" + gy + "]");
+            }
         }
       }
     }
