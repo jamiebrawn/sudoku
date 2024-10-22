@@ -1,5 +1,6 @@
 function draw() {
   const size = 2;
+  const size_row = size * size; // Size for one of the whole row/col
   const size_square = 100;  // Size of the white squares
   const size_border = 10;   // Size of the border surrounding it
   const size_each = size_square + size_border;  // Size of white square and one side of border together
@@ -7,7 +8,7 @@ function draw() {
   const canvas = document.getElementById("sudoku");
   const ctx = canvas.getContext("2d");
 
-  var size_whole = size * size * size_each + size_border;
+  var size_whole = size_row * size_each + size_border;
 
   // Black background, for the black border
   ctx.fillStyle = "black";
@@ -31,6 +32,13 @@ function draw() {
           // White squares
           ctx.fillStyle = "white";
           ctx.fillRect(x * size_each + size_border, y * size_each + size_border, size_square, size_square);
+
+          // Text
+          ctx.fillStyle = "black";
+          ctx.font = size_square + "px sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("1", (x + 0.5) * size_each + size_border, (y + 0.5) * size_each + size_border);
         }
       }
     }
