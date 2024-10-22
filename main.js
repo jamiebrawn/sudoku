@@ -1,14 +1,17 @@
-function draw() {
-  const size = 2;   // Can support up to 6
-  const size_row = size * size; // Size for one of the whole row/col
-  const size_square = 100;  // Size of the white squares
-  const size_border = 10;   // Size of the border surrounding it
-  const size_each = size_square + size_border;  // Size of white square and one side of border together
+const size = 2;   // Can support up to 6
+const size_row = size * size; // Size for one of the whole row/col
+const size_square = 100;  // Size of the white squares
+const size_border = 10;   // Size of the border surrounding it
+const size_each = size_square + size_border;  // Size of white square and one side of border together
 
-  var symbols_grid = new Array(size); // A grid to store symbols
+var symbols_grid;   // a grid to store symbols
+var symbols_list = []; // List of symbols to display
+
+function draw() {
   // grid variable would be structured as this:
   // symbols_grid[sx][sy][gx][gy]
   // sx and sy as a section, gx and gy as a position inside of one of the section
+  symbols_grid = new Array(size);   // creating [sx]
   for (var sx = 0; sx < size; sx++) {
     symbols_grid[sx] = new Array(size); // creating [sy]
     for (var sy = 0; sy < size; sy++) {
@@ -18,8 +21,6 @@ function draw() {
       }
     }
   }
-
-  var symbols_list = []; // List of symbols to display
 
   // Add in numbers
   if (size == 6)    // 6 is 36, need all 1-9, A-Z and 0 to be able to have enough of it
@@ -63,7 +64,8 @@ function draw() {
           var y = sy * size + gy;
 
           // Select a random symbol to use
-          var symbol = getRandomItemInArray(symbols_list);
+          var symbols_possible = getPossibleSymbols(sx, sy, gx, gy);
+          var symbol = getRandomItemInArray(symbols_possible);
           symbols_grid[sx][sy][gx][gy] = symbol;
 
           // White squares
@@ -80,6 +82,39 @@ function draw() {
       }
     }
   }
+}
+
+function getPossibleSymbols(sx1, sy1, gx1, gy1) {
+  // Figure out which symbols it could be used for this
+  var symbols_possible = [...symbols_list]; // Clone an array
+
+  for (var sx2 = 0; sx2 < size; sx2++) {
+    for (var sy2 = 0; sy2 < size; sy2++) {
+      for (var gx2 = 0; gx2 < size; gx2++) {
+        for (var gy2 = 0; gy2 < size; gy2++) {
+
+            // Symbols must be unique from eachother by section, row and col
+            if (
+                (sx1 == sx2 && sy1 == sy2)  // section
+                || (sx1 == sx2 && gx1 == gx2)   // col
+                || (sy1 == sy2 && gy1 == gy2)   // row
+            ) {
+                var symbol = symbols_grid[sx2][sy2][gx2][gy2];
+                removeItemInArray(symbols_possible, symbol);
+            }
+        }
+      }
+    }
+  }
+
+  return symbols_possible;
+}
+
+function removeItemInArray(array, item) {
+    const index = array.indexOf(item);
+    if (index > -1) { // only splice array when item is found
+        array.splice(index, 1); // 2nd parameter means remove one item only
+    }
 }
 
 function getRandomItemInArray(array) {
