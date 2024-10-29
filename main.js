@@ -1,4 +1,4 @@
-const size = 2;   // Can support up to 6
+const size = 3;   // Can support up to 6
 const size_row = size * size; // Size for one of the whole row/col
 const size_square = 100;  // Size of the white squares
 const size_border = 10;   // Size of the border surrounding it
@@ -22,6 +22,8 @@ function draw() {
     }
   }
 
+  symbols_list = [];
+
   // Add in numbers
   if (size == 6)    // 6 is 36, need all 1-9, A-Z and 0 to be able to have enough of it
     symbols_list.push(0);
@@ -38,6 +40,11 @@ function draw() {
   for (var i = 0; i < alphabet_max; i++)
     symbols_list.push(alphabet[i]);
 
+  if (!rollSymbols()) {
+    // if a problem happens where one square can't accept any number, start all over again
+    draw();
+    return;
+  }
 
   const canvas = document.getElementById("sudoku");
   const ctx = canvas.getContext("2d");
@@ -64,13 +71,6 @@ function draw() {
           var y = sy * size + gy;
 
           var symbol = symbols_grid[sx][sy][gx][gy];
-          if (!symbol) {
-              // Select a random symbol to use, if not already set from checkLoneValidSymbols
-              var symbols_possible = getPossibleSymbols(sx, sy, gx, gy);
-              symbol = getRandomItemInArray(symbols_possible);
-              symbols_grid[sx][sy][gx][gy] = symbol;
-              checkLoneValidSymbols();
-          }
 
           // White squares
           ctx.fillStyle = "white";
@@ -88,6 +88,29 @@ function draw() {
   }
 }
 
+function rollSymbols() {
+    // This function is to roll what symbols it should be for each squares
+
+  for (var sx = 0; sx < size; sx++) {
+    for (var sy = 0; sy < size; sy++) {
+      for (var gx = 0; gx < size; gx++) {
+        for (var gy = 0; gy < size; gy++) {
+            if (symbols_grid[sx][sy][gx][gy])
+                continue;   // already set
+
+            var symbols_possible = getPossibleSymbols(sx, sy, gx, gy);
+            var symbol = getRandomItemInArray(symbols_possible);
+            symbols_grid[sx][sy][gx][gy] = symbol;
+            if (!checkLoneValidSymbols())
+                return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
 function checkLoneValidSymbols() {
   // This is used to go though all spots and check if there only one available symbol to use
   for (var sx = 0; sx < size; sx++) {
@@ -102,15 +125,17 @@ function checkLoneValidSymbols() {
                 symbols_grid[sx][sy][gx][gy] = symbols_possible[0];
 
                 // Since we just added one, start again on searching for another lone symbol
-                checkLoneValidSymbols();
-                return;
+                return checkLoneValidSymbols();
             } else if (symbols_possible.length == 0) {
-                throw new Error("No available symbol to select at [" + sx + "][" + sy + "][" + gx + "][" + gy + "]");
+                //throw new Error("No available symbol to select at [" + sx + "][" + sy + "][" + gx + "][" + gy + "]");
+                return false;
             }
         }
       }
     }
   }
+
+  return true;
 }
 
 function getPossibleSymbols(sx1, sy1, gx1, gy1) {
