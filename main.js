@@ -75,17 +75,34 @@ function draw() {
           // White squares
           ctx.fillStyle = "white";
           ctx.fillRect(x * size_each + size_border, y * size_each + size_border, size_square, size_square);
-
-          // Text
-          ctx.fillStyle = "black";
-          ctx.font = size_square + "px sans-serif";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(symbol, (x + 0.5) * size_each + (size_border * 0.5), (y + 0.5) * size_each + size_border);
         }
       }
     }
   }
+
+  canvas.addEventListener('click', function(e) {
+    var x = e.offsetX;
+    var y = e.offsetY;
+
+    x = Math.floor(x / size_each);
+    y = Math.floor(y / size_each);
+
+    var sx = Math.floor(x / size);
+    var sy = Math.floor(x / size);
+    var gx = x - (sx * size);
+    var gy = y - (sy * size);
+    var symbol = symbols_grid[sx][sy][gx][gy];
+
+    const ctx = canvas.getContext("2d");
+
+    // Text
+    ctx.fillStyle = "black";
+    ctx.font = size_square + "px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(symbol, (x + 0.5) * size_each + (size_border * 0.5), (y + 0.5) * size_each + size_border);
+
+  }, false);
 }
 
 function rollSymbols() {
