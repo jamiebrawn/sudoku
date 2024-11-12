@@ -71,8 +71,6 @@ function draw() {
           var x = sx * size + gx;
           var y = sy * size + gy;
 
-          var symbol = symbols_grid[sx][sy][gx][gy];
-
           // White squares
           ctx.fillStyle = "white";
           ctx.fillRect(x * size_each + size_border, y * size_each + size_border, size_square, size_square);
@@ -91,7 +89,7 @@ function draw() {
     y = Math.floor(y / size_each);
 
     var sx = Math.floor(x / size);
-    var sy = Math.floor(x / size);
+    var sy = Math.floor(y / size);
     var gx = x - (sx * size);
     var gy = y - (sy * size);
 
