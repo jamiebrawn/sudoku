@@ -6,6 +6,7 @@ const size_each = size_square + size_border;  // Size of white square and one si
 
 var symbols_grid;   // a grid to store symbols
 var symbols_list = []; // List of symbols to display
+var cxt;    // the canvas context to draw
 
 function draw() {
   // grid variable would be structured as this:
@@ -47,7 +48,7 @@ function draw() {
   }
 
   const canvas = document.getElementById("sudoku");
-  const ctx = canvas.getContext("2d");
+  ctx = canvas.getContext("2d");
 
   var size_whole = size_row * size_each + size_border;
 
@@ -75,6 +76,8 @@ function draw() {
           // White squares
           ctx.fillStyle = "white";
           ctx.fillRect(x * size_each + size_border, y * size_each + size_border, size_square, size_square);
+
+          //drawText(sx, sy, gx, gy);
         }
       }
     }
@@ -91,9 +94,15 @@ function draw() {
     var sy = Math.floor(x / size);
     var gx = x - (sx * size);
     var gy = y - (sy * size);
-    var symbol = symbols_grid[sx][sy][gx][gy];
 
-    const ctx = canvas.getContext("2d");
+    drawText(sx, sy, gx, gy);
+  }, false);
+}
+
+function drawText(sx, sy, gx, gy) {
+    var symbol = symbols_grid[sx][sy][gx][gy];
+    var x = (sx * size) + gx;
+    var y = (sy * size) + gy;
 
     // Text
     ctx.fillStyle = "black";
@@ -101,8 +110,6 @@ function draw() {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(symbol, (x + 0.5) * size_each + (size_border * 0.5), (y + 0.5) * size_each + size_border);
-
-  }, false);
 }
 
 function rollSymbols() {
