@@ -7,6 +7,7 @@ const size_each = size_square + size_border;  // Size of white square and one si
 var symbols_grid;   // a grid to store symbols
 var symbols_list = []; // List of symbols to display
 var cxt;    // the canvas context to draw
+var selectedSquare = null;    // coords on the selected square
 
 function draw() {
   // grid variable would be structured as this:
@@ -68,13 +69,8 @@ function draw() {
 
       for (var gx = 0; gx < size; gx++) {
         for (var gy = 0; gy < size; gy++) {
-          var x = sx * size + gx;
-          var y = sy * size + gy;
-
-          // White squares
-          ctx.fillStyle = "white";
-          ctx.fillRect(x * size_each + size_border, y * size_each + size_border, size_square, size_square);
-
+          // Draw a white square
+          drawSquare(sx, sy, gx, gy, "white");
           //drawText(sx, sy, gx, gy);
         }
       }
@@ -82,6 +78,10 @@ function draw() {
   }
 
   canvas.addEventListener('click', function(e) {
+    // Clear the selected square back to white
+    if (selectedSquare)
+        drawSquare(selectedSquare.sx, selectedSquare.sy, selectedSquare.gx, selectedSquare.gy, "white");
+
     var x = e.offsetX;
     var y = e.offsetY;
 
@@ -90,11 +90,27 @@ function draw() {
 
     var sx = Math.floor(x / size);
     var sy = Math.floor(y / size);
-    var gx = x - (sx * size);
-    var gy = y - (sy * size);
 
-    drawText(sx, sy, gx, gy);
+    // Set selectedSquare variable so it can be set back to white later when done
+    selectedSquare = {
+        sx: sx,
+        sy: sy,
+        gx: x - (sx * size),
+        gy: y - (sy * size),
+    }
+
+    drawSquare(selectedSquare.sx, selectedSquare.sy, selectedSquare.gx, selectedSquare.gy, "gold");
+    //drawText(sx, sy, gx, gy);
   }, false);
+}
+
+function drawSquare(sx, sy, gx, gy, color) {
+    var x = sx * size + gx;
+    var y = sy * size + gy;
+
+    // draw a square at specific cords
+    ctx.fillStyle = color;
+    ctx.fillRect(x * size_each + size_border, y * size_each + size_border, size_square, size_square);
 }
 
 function drawText(sx, sy, gx, gy) {
